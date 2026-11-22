@@ -15,6 +15,7 @@ import bank.service.FileService;
 import bank.service.EmployeeService;
 import java.util.ArrayList;
 import java.util.Scanner;
+import bank.view.BankView;
 
 public class Main {
 
@@ -23,6 +24,7 @@ public class Main {
         String filename = "Applicants_Form.txt";
 
         FileService fileService = new FileService();
+        BankView view = new BankView();
 
         ArrayList<Employee> employees =
                 fileService.readFile(filename);
@@ -33,15 +35,7 @@ public class Main {
         MenuOption option;
 
         do {
-            System.out.println("\n=== BANK EMPLOYEE SYSTEM ===");
-            System.out.println("1. Show employees");
-            System.out.println("2. Search employee");
-            System.out.println("3. Sort employees");
-            System.out.println("4. Add records");
-            System.out.println("5. Show binary tree");
-            System.out.println("6. Exit");
-            System.out.print("Choose an option: ");
-
+            view.showMenu();
             String input = scanner.nextLine();
 
             switch (input) {
