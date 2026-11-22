@@ -1,14 +1,8 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
+
 package bank.model;
 
-/**
- *
- * @author natvi
- */
 public class Employee {
+
     private String firstName;
     private String lastName;
     private String gender;
@@ -55,6 +49,14 @@ public class Employee {
         return email;
     }
 
+    public String toFileString() {
+        return firstName + "," + lastName + ","
+                + gender + "," + email + ","
+                + salary + "," + department + ","
+                + position + "," + jobTitle + ","
+                + company;
+    }
+
     @Override
     public String toString() {
         return getFullName() + " | "
@@ -62,6 +64,3 @@ public class Employee {
                 + jobTitle;
     }
 }
-
-    
-
