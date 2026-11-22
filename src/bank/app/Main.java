@@ -9,8 +9,8 @@ package bank.app;
  * @author natvi
  */
 
-
 import bank.model.Employee;
+import bank.model.EmployeeTree;
 import bank.service.FileService;
 import bank.service.EmployeeService;
 import java.util.ArrayList;
@@ -20,13 +20,16 @@ public class Main {
 
     public static void main(String[] args) {
 
+        String filename = "Applicants_Form.txt";
+
         FileService fileService = new FileService();
 
         ArrayList<Employee> employees =
-                fileService.readFile("Applicants_Form.txt");
+                fileService.readFile(filename);
 
         Scanner scanner = new Scanner(System.in);
         EmployeeService employeeService = new EmployeeService();
+
         MenuOption option;
 
         do {
@@ -34,7 +37,9 @@ public class Main {
             System.out.println("1. Show employees");
             System.out.println("2. Search employee");
             System.out.println("3. Sort employees");
-            System.out.println("4. Exit");
+            System.out.println("4. Add records");
+            System.out.println("5. Show binary tree");
+            System.out.println("6. Exit");
             System.out.print("Choose an option: ");
 
             String input = scanner.nextLine();
@@ -50,6 +55,12 @@ public class Main {
                     option = MenuOption.SORT_EMPLOYEES;
                     break;
                 case "4":
+                    option = MenuOption.ADD_RECORDS;
+                    break;
+                case "5":
+                    option = MenuOption.SHOW_TREE;
+                    break;
+                case "6":
                     option = MenuOption.EXIT;
                     break;
                 default:
@@ -58,40 +69,151 @@ public class Main {
             }
 
             switch (option) {
+
                 case SHOW_EMPLOYEES:
-                    for (Employee employee : employees) {
-                        System.out.println(employee);
+
+                    if (employees.isEmpty()) {
+                        System.out.println("No employees found.");
+                    } else {
+                        for (Employee employee : employees) {
+                            System.out.println(employee);
+                        }
                     }
                     break;
 
-                
-                 case SEARCH_EMPLOYEE:
-                  System.out.print("Enter employee full name: ");
-                  String name = scanner.nextLine();
+                case SEARCH_EMPLOYEE:
 
-                  Employee found = employeeService.searchEmployee(
-                   employees, name);
+                    System.out.print("Enter employee full name: ");
+                    String name = scanner.nextLine();
 
-                 if (found != null) {
-                 System.out.println("Employee found: " + found);
-                } else {
-                 System.out.println("Employee not found.");
-                }
-                 break;
+                    Employee found =
+                            employeeService.searchEmployee(
+                                    employees, name);
 
-                
-                 case SORT_EMPLOYEES:
-                 employeeService.sortEmployees(employees);
+                    if (found != null) {
+                        System.out.println("Employee found: " + found);
+                    } else {
+                        System.out.println("Employee not found.");
+                    }
+                    break;
 
-                 System.out.println("\nEmployees sorted alphabetically:");
+                case SORT_EMPLOYEES:
 
-                 for (Employee employee : employees) {
-                 System.out.println(employee);
-                }
-                 break;
+                    employeeService.sortEmployees(employees);
 
+                    System.out.println("\nFirst 20 employees:");
+
+                    int limit = Math.min(20, employees.size());
+
+                    for (int i = 0; i < limit; i++) {
+                        System.out.println(employees.get(i));
+                    }
+                    break;
+
+                case ADD_RECORDS:
+
+                    System.out.println("\n=== ADD NEW EMPLOYEE ===");
+
+                    System.out.print("First name: ");
+                    String firstName = scanner.nextLine().trim();
+
+                    System.out.print("Last name: ");
+                    String lastName = scanner.nextLine().trim();
+
+                    System.out.print("Gender: ");
+                    String gender = scanner.nextLine().trim();
+
+                    System.out.print("Email: ");
+                    String email = scanner.nextLine().trim();
+
+                    System.out.print("Salary: ");
+                    String salaryInput = scanner.nextLine().trim();
+
+                    System.out.print("Department: ");
+                    String department = scanner.nextLine().trim();
+
+                    System.out.print("Position: ");
+                    String position = scanner.nextLine().trim();
+
+                    System.out.print("Job title: ");
+                    String jobTitle = scanner.nextLine().trim();
+
+                    System.out.print("Company: ");
+                    String company = scanner.nextLine().trim();
+
+                    String[] fields = {
+                        firstName, lastName, gender, email,
+                        salaryInput, department, position,
+                        jobTitle, company
+                    };
+
+                    boolean valid = true;
+
+                    for (String field : fields) {
+                        if (field.isEmpty() || field.contains(",")
+                                || field.contains("\n")
+                                || field.contains("\r")) {
+                            valid = false;
+                            break;
+                        }
+                    }
+
+                    if (!valid) {
+                        System.out.println("Invalid employee details.");
+                        break;
+                    }
+
+                    double salary;
+
+                    try {
+                        salary = Double.parseDouble(salaryInput);
+
+                        if (!Double.isFinite(salary) || salary < 0) {
+                            System.out.println("Invalid salary.");
+                            break;
+                        }
+
+                    } catch (NumberFormatException e) {
+                        System.out.println("Invalid salary.");
+                        break;
+                    }
+
+                    Employee newEmployee = new Employee(
+                            firstName, lastName, gender,
+                            email, salary, department,
+                            position, jobTitle, company
+                    );
+
+                    if (fileService.addRecord(filename, newEmployee)) {
+                        employees.add(newEmployee);
+                        System.out.println("Employee added successfully!");
+                    }
+                    break;
+
+                case SHOW_TREE:
+
+                    EmployeeTree tree = new EmployeeTree();
+
+                    int total = Math.min(20, employees.size());
+
+                    for (int i = 0; i < total; i++) {
+                        tree.insert(employees.get(i));
+                    }
+
+                    System.out.println("\n=== BINARY SEARCH TREE ===");
+
+                    tree.levelOrder();
+
+                    System.out.println(
+                            "\nTotal nodes: " + tree.countNodes());
+
+                    System.out.println(
+                            "Tree height: " + tree.getHeight());
+
+                    break;
 
                 case EXIT:
+
                     System.out.println("Goodbye!");
                     break;
             }
